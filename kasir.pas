@@ -4,6 +4,7 @@ uses crt;
 
 var
   pilihan: integer;
+  nama: string;
   harga: longint;
   jumlah: integer;
   subtotal: longint;
@@ -15,8 +16,25 @@ var
   i: integer;
   pecahan: longint;
   jumlah_pecahan: longint;
+  total_jumlah_item: longint;
+  total_transaksi: integer;
+  total_kotor_semua: longint;
+  total_diskon_semua: longint;
+  total_bersih_semua: longint;
+  total_item_semua: longint;
+  last_nama: string;
+  last_total_bayar: longint;
 
 begin
+  { Inisialisasi akumulasi riwayat penjualan }
+  total_transaksi := 0;
+  total_kotor_semua := 0;
+  total_diskon_semua := 0;
+  total_bersih_semua := 0;
+  total_item_semua := 0;
+  last_nama := '-';
+  last_total_bayar := 0;
+
   { Menu utama }
   repeat
     clrscr;
@@ -28,8 +46,9 @@ begin
     gotoxy(1, 3);
     writeln('================================');
     writeln('1. Transaksi Baru');
-    writeln('2. Keluar');
-    write('Pilih menu [1/2]: ');
+    writeln('2. Riwayat Penjualan');
+    writeln('3. Keluar');
+    write('Pilih menu [1/2/3]: ');
     readln(pilihan);
 
     case pilihan of
@@ -40,6 +59,7 @@ begin
         textcolor(15);
         writeln('=== TRANSAKSI BARU ===');
         total := 0;
+        total_jumlah_item := 0;
 
         while true do
         begin
@@ -57,6 +77,9 @@ begin
             continue;
           end;
 
+          write('Nama barang: ');
+          readln(nama);
+
           write('Jumlah barang: ');
           readln(jumlah);
 
@@ -70,102 +93,157 @@ begin
 
           subtotal := harga * jumlah;
           total := total + subtotal;
+          total_jumlah_item := total_jumlah_item + jumlah;
           textcolor(10);
-          writeln('Subtotal: ', subtotal);
+          writeln(nama, ' x ', jumlah, ' = Rp', subtotal);
           textcolor(15);
         end;
 
-        { Diskon bertingkat }
-        if total >= 500000 then
+        if total = 0 then
         begin
-          diskon := total * 10 div 100;
-          textcolor(10);
-          writeln('Diskon 10%: ', diskon);
-        end
-        else if total >= 100000 then
-        begin
-          diskon := total * 5 div 100;
-          textcolor(10);
-          writeln('Diskon 5%: ', diskon);
+          textcolor(12);
+          writeln('Tidak ada barang yang dibeli.');
+          textcolor(15);
+          writeln('Tekan Enter...');
+          readln;
         end
         else
         begin
-          diskon := 0;
-          writeln('Diskon: 0');
-        end;
-
-        textcolor(15);
-        total_bayar := total - diskon;
-        writeln('Total sebelum diskon: ', total);
-        writeln('Total bayar: ', total_bayar);
-
-        { Pembayaran }
-        repeat
-          write('Uang bayar: ');
-          readln(bayar);
-
-          if bayar < total_bayar then
+          { Diskon bertingkat }
+          if total >= 500000 then
           begin
-            textcolor(12);
-            writeln('Error: uang bayar kurang dari total bayar.');
-            textcolor(15);
+            diskon := total * 10 div 100;
+            textcolor(10);
+            writeln('Diskon 10%: ', diskon);
+          end
+          else if total >= 100000 then
+          begin
+            diskon := total * 5 div 100;
+            textcolor(10);
+            writeln('Diskon 5%: ', diskon);
+          end
+          else
+          begin
+            diskon := 0;
+            writeln('Diskon: 0');
           end;
-        until bayar >= total_bayar;
 
-        kembalian := bayar - total_bayar;
-        textcolor(10);
-        writeln('Kembalian: ', kembalian);
-        textcolor(15);
+          textcolor(15);
+          total_bayar := total - diskon;
+          writeln('Total sebelum diskon: ', total);
+          writeln('Total bayar: ', total_bayar);
 
-        { Struk }
-        writeln('------------------------');
-        writeln('STRUK PEMBAYARAN');
-        writeln('------------------------');
-        writeln('Total':20, total:10);
-        writeln('Diskon':20, diskon:10);
-        writeln('Total Bayar':20, total_bayar:10);
-        writeln('Bayar':20, bayar:10);
-        writeln('Kembalian':20, kembalian:10);
-        writeln('------------------------');
-        writeln('Pecahan kembalian:');
+          { Pembayaran }
+          repeat
+            write('Uang bayar: ');
+            readln(bayar);
 
-        if kembalian = 0 then
-          writeln('Tidak ada kembalian.')
-        else
-        begin
-          { Pecahan uang dengan for-to-do }
-          for i := 1 to 9 do
-          begin
-            case i of
-              1: pecahan := 100000;
-              2: pecahan := 50000;
-              3: pecahan := 20000;
-              4: pecahan := 10000;
-              5: pecahan := 5000;
-              6: pecahan := 2000;
-              7: pecahan := 1000;
-              8: pecahan := 500;
-              9: pecahan := 100;
-            else
-              pecahan := 0;
-            end;
-
-            jumlah_pecahan := kembalian div pecahan;
-            if jumlah_pecahan > 0 then
+            if bayar < total_bayar then
             begin
-              writeln('Rp', pecahan:6, ' x ', jumlah_pecahan);
-              kembalian := kembalian mod pecahan;
+              textcolor(12);
+              writeln('Error: uang bayar kurang dari total bayar.');
+              textcolor(15);
+            end;
+          until bayar >= total_bayar;
+
+          kembalian := bayar - total_bayar;
+          textcolor(10);
+          writeln('Kembalian: ', kembalian);
+          textcolor(15);
+
+          { Struk }
+          writeln('------------------------');
+          writeln('STRUK PEMBAYARAN');
+          writeln('------------------------');
+          writeln('Jumlah item':20, total_jumlah_item:10);
+          writeln('Total':20, total:10);
+          writeln('Diskon':20, diskon:10);
+          writeln('Total Bayar':20, total_bayar:10);
+          writeln('Bayar':20, bayar:10);
+          writeln('Kembalian':20, kembalian:10);
+          writeln('------------------------');
+          writeln('Pecahan kembalian:');
+
+          if kembalian = 0 then
+            writeln('Tidak ada kembalian.')
+          else
+          begin
+            { Pecahan uang dengan for-to-do }
+            for i := 1 to 9 do
+            begin
+              case i of
+                1: pecahan := 100000;
+                2: pecahan := 50000;
+                3: pecahan := 20000;
+                4: pecahan := 10000;
+                5: pecahan := 5000;
+                6: pecahan := 2000;
+                7: pecahan := 1000;
+                8: pecahan := 500;
+                9: pecahan := 100;
+              else
+                pecahan := 0;
+              end;
+
+              jumlah_pecahan := kembalian div pecahan;
+              if jumlah_pecahan > 0 then
+              begin
+                writeln('Rp', pecahan:6, ' x ', jumlah_pecahan);
+                kembalian := kembalian mod pecahan;
+              end;
             end;
           end;
-        end;
 
-        writeln('------------------------');
-        textcolor(10);
-        writeln('Transaksi selesai. Tekan Enter...');
-        textcolor(15);
-        readln;
+          writeln('------------------------');
+
+          { Update riwayat penjualan }
+          total_transaksi := total_transaksi + 1;
+          total_kotor_semua := total_kotor_semua + total;
+          total_diskon_semua := total_diskon_semua + diskon;
+          total_bersih_semua := total_bersih_semua + total_bayar;
+          total_item_semua := total_item_semua + total_jumlah_item;
+          last_nama := nama;
+          last_total_bayar := total_bayar;
+
+          textcolor(10);
+          writeln('Transaksi selesai. Tekan Enter...');
+          textcolor(15);
+          readln;
+        end;
       end;
       2:
+      begin
+        { Riwayat penjualan (akumulatif) }
+        clrscr;
+        textcolor(15);
+        writeln('================================');
+        writeln('       RIWAYAT PENJUALAN');
+        writeln('================================');
+
+        if total_transaksi = 0 then
+        begin
+          textcolor(12);
+          writeln('Belum ada transaksi.');
+          textcolor(15);
+        end
+        else
+        begin
+          writeln('Jumlah transaksi':25, total_transaksi:10);
+          writeln('Total penjualan kotor':25, total_kotor_semua:10);
+          writeln('Total diskon':25, total_diskon_semua:10);
+          writeln('Total penjualan bersih':25, total_bersih_semua:10);
+          writeln('Total item terjual':25, total_item_semua:10);
+          writeln('------------------------');
+          writeln('Transaksi terakhir:');
+          writeln('Nama barang terakhir':25, ': ', last_nama);
+          writeln('Total bayar terakhir':25, last_total_bayar:10);
+        end;
+
+        writeln('------------------------');
+        writeln('Tekan Enter...');
+        readln;
+      end;
+      3:
       begin
         clrscr;
         textcolor(10);
@@ -181,5 +259,5 @@ begin
         readln;
       end;
     end;
-  until pilihan = 2;
+  until pilihan = 3;
 end.
