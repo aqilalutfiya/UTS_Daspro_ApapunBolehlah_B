@@ -38,7 +38,7 @@ Program menyimpan rekap jumlah transaksi, total penjualan kotor, total diskon, t
    Menampilkan struk transaksi. Jika ada kembalian, program memecah nilai uang dari Rp100.000 hingga Rp100 menggunakan perulangan `for-to-do` dan `case-of`, memanfaatkan operator `div` untuk menghitung jumlah lembar/koin dan `mod` untuk sisa kembalian.
 ### 7. Rekap Riwayat Penjualan
    Setiap transaksi selesai, akumulator global (total transaksi, omzet kotor/bersih, diskon, total item, dan data transaksi terakhir) otomatis diperbarui untuk ditampilkan pada menu *Riwayat Penjualan*.
-### 8. Mengakhiri Program*
+### 8. Mengakhiri Program
    Pilihan menu *Keluar* menampilkan pesan penutup dan menghentikan perulangan `repeat-until` utama secara bersih.
 
 ## 👥 Anggota Kelompok
